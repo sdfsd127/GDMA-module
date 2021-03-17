@@ -30,11 +30,13 @@ public class Minigame : MonoBehaviour
 
     protected void MinigameLost()
     {
+        Completed = false;
         SceneManager.LoadScene("Main Scene");
     }
 
     protected void MinigameWon()
     {
+        Completed = true;
         SceneManager.LoadScene("Main Scene");
     }
 }

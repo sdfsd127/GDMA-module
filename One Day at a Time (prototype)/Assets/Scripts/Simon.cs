@@ -26,11 +26,10 @@ public class Simon : Minigame
     }
     private GAME_STATE gameState;
 
-    private const int MAX_COUNT = 12;
     private int currentCount;
+    private const int MAX_COUNT = 5;
     private const float TIME_BETWEEN_FADE_CYCLE = 0.25f;
     private const float TIME_HIGHLIGHTED = 0.5f;
-    private Coroutine colourDisplayCoroutine;
     
     //
     // GAME LOOP
@@ -39,7 +38,7 @@ public class Simon : Minigame
     {
         // Base Class
         m_MinigameName = "Simon";
-        m_DisplayedInformation = "This is simon.";
+        m_DisplayedInformation = "This is Simon.";
 
         InitMinigame();
 
@@ -59,12 +58,7 @@ public class Simon : Minigame
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.P))
-            for (int i = 0; i < colourEntries.Count; i++)
-                Debug.Log(colourEntries[i]);
 
-        if (Input.GetKeyUp(KeyCode.L))
-            DisplayCurrentPattern();
     }
 
     private void AddNewColour()
@@ -84,7 +78,7 @@ public class Simon : Minigame
 
     private void DisplayCurrentPattern()
     {
-        colourDisplayCoroutine = StartCoroutine(DisplayPattern());
+        StartCoroutine(DisplayPattern());
     }
 
     //
