@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class BasicNeed
+﻿public class BasicNeed
 {
     public string m_RequirementName;
     public int m_MaxValue;
