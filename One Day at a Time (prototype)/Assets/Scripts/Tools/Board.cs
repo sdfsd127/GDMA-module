@@ -1,5 +1,37 @@
 ﻿public class Board
 {
+    public class Boardspace
+    {
+        public BoardPosition position;
+        public bool filled;
+        public bool active;
+
+        public Boardspace()
+        {
+
+        }
+
+        public Boardspace(BoardPosition position_)
+        {
+            position = position_;
+        }
+
+        public void SetFilledState(bool state) { filled = state; }
+        public void SetActiveState(bool state) { active = state; }
+
+        public void WakeUp()
+        {
+            SetFilledState(true);
+            SetActiveState(true);
+        }
+
+        public void Sleep()
+        {
+            SetFilledState(false);
+            SetActiveState(false);
+        }
+    }
+
     public int BOARD_WIDTH;
     public int BOARD_HEIGHT;
 
@@ -23,26 +55,6 @@
     }
 }
 
-public class Boardspace
-{
-    public BoardPosition position;
-    public bool filled;
-    public bool active;
-
-    public Boardspace()
-    {
-
-    }
-
-    public Boardspace(BoardPosition position_)
-    {
-        position = position_;
-    }
-
-    public void SetFilledState(bool state) { filled = state; }
-    public void SetActiveState(bool state) { active = state; }
-}
-
 public class BoardPosition
 {
     public int x;
@@ -60,7 +72,17 @@ public class BoardPosition
         y = (int)y_;
     }
 
+    public void DebugLog(string name = null)
+    {
+        if (name == null)
+            UnityEngine.Debug.Log(("X: {0}, Y: {1}", x, y));
+        else
+            UnityEngine.Debug.Log(("{0}| X: {1}, Y: {2}", name, x, y));
+    }
+
+    //
     // STATICS
+    //
     public static BoardPosition operator +(BoardPosition left, BoardPosition right) => new BoardPosition(left.x + right.x, left.y + right.y);
     public static BoardPosition operator -(BoardPosition left, BoardPosition right) => new BoardPosition(left.x - right.x, left.y - right.y);
     public static BoardPosition operator *(BoardPosition left, BoardPosition right) => new BoardPosition(left.x * right.x, left.y * right.y);
