@@ -126,15 +126,16 @@ public class Tetris : Minigame
         {
             gameStepTimer.ResetTimer();
 
-            if (CanMovePieceDown())
-                MovePieceDown();
-            else
-                SpawnNextPiece();
+            if (currentPiece != null)
+            {
+                if (CanMovePieceDown())
+                    MovePieceDown();
+                else
+                    SpawnNextPiece();
+            }
         }
         else
             gameStepTimer.AddTime(Time.deltaTime);
-
-        Debug.Log(currentPiece == null);
     }
 
     private void SpawnNextPiece()
@@ -184,10 +185,14 @@ public class Tetris : Minigame
         bool obstructed = false;
 
         for (int i = 0; i < currentPiece.positions.Length; i++)
-            if (!IsSelfContained(currentPiece.positions, currentPiece.positions[i] + BoardPosition.down) && IsPieceBelow(currentPiece.positions[i]))
-                obstructed = true;
+        {
+            BoardPosition below = currentPiece.positions[i] + BoardPosition.down;
 
-        return obstructed;
+            if (!IsInbounds(below) || (!IsSelfContained(currentPiece.positions, below) && IsPieceBelow(currentPiece.positions[i])))
+                obstructed = true;
+        }
+        
+        return !obstructed;
     }
 
     private void MovePieceDown()
