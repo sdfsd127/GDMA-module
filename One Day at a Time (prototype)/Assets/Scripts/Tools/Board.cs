@@ -87,6 +87,8 @@ public class BoardPosition
     public static BoardPosition operator -(BoardPosition left, BoardPosition right) => new BoardPosition(left.x - right.x, left.y - right.y);
     public static BoardPosition operator *(BoardPosition left, BoardPosition right) => new BoardPosition(left.x * right.x, left.y * right.y);
     public static BoardPosition operator /(BoardPosition left, BoardPosition right) => new BoardPosition(left.x / right.x, left.y / right.y);
+    public static bool operator ==(BoardPosition left, BoardPosition right) { return (left.x == right.x && left.y == right.y); }
+    public static bool operator !=(BoardPosition left, BoardPosition right) { return !(left == right); }
 
     public static BoardPosition up = new BoardPosition(0, 1);
     public static BoardPosition down = new BoardPosition(0, -1);

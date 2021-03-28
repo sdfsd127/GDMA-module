@@ -310,6 +310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactRange: 2.5
+  layerIndex: 9
 --- !u!1 &471121446
 GameObject:
   m_ObjectHideFlags: 0
