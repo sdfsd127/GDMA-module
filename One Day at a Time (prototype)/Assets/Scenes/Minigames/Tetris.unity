@@ -342,12 +342,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -670,7 +670,6 @@ MonoBehaviour:
   - {r: 0.9245283, g: 0.91659665, b: 0.16135636, a: 1}
   - {r: 0.9245283, g: 0.5757682, b: 0.16135636, a: 1}
   - {r: 0.16078432, g: 0.9254902, b: 0.7361925, a: 1}
-  preboardColour: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
 --- !u!4 &803323997
 Transform:
   m_ObjectHideFlags: 0

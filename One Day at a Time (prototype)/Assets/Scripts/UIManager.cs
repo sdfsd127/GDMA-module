@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image[] gaugeImages;
 
     [SerializeField] private Text timeText;
+    [SerializeField] private GameObject interactTextObject;
+    [SerializeField] private Text interactText;
 
     private void Awake()
     {
@@ -19,6 +21,9 @@ public class UIManager : MonoBehaviour
             Destroy(this);
     }
 
+    //
+    // EXTERNAL FUNCTIONS
+    //
     public void SetGauge(int gaugeIndex, float percent)
     {
         gaugeImages[gaugeIndex].fillAmount = Mathf.Clamp(percent, 0.0f, 1.0f);
@@ -26,9 +31,25 @@ public class UIManager : MonoBehaviour
 
     public void SetTime(int currentTime, bool am)
     {
-        timeText.text = currentTime.ToString("00") + ":00" + ((am) ? "am" : "pm");
+        if (timeText != null && timeText.text != null)
+            timeText.text = currentTime.ToString("00") + ":00" + ((am) ? "am" : "pm");
     }
 
+    public void ShowWithinInteractRange()
+    {
+        if (interactTextObject != null)
+            interactTextObject.SetActive(true);
+    }
+
+    public void HideWithinInteractRange()
+    {
+        if (interactTextObject != null)
+            interactTextObject.SetActive(false);
+    }
+
+    // 
+    // EXTERNAL BUTTONS
+    //
     public void FillGaugeButton(int gaugeIndex)
     {
         GameManager.Instance.FillGauge(gaugeIndex);

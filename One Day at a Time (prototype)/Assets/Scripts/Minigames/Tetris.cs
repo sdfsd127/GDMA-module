@@ -15,29 +15,30 @@ public class Tetris : Minigame
     }
     private TetrisShape[] shapes;
 
+    private class TetrisPiece
+    {
+        TetrisShape shape;
+        BoardPosition position;
+    }
+
     // Board vars
-    private Board preboard; // Where the shapes initially spawn
     private Board board; // Actual playfield board
     private const int BOARD_WIDTH = 5;
-    private const int BOARD_HEIGHT = 8;
-    private const int PREBOARD_WIDTH = 5;
-    private const int PREBOARD_HEIGHT = 3;
+    private const int BOARD_HEIGHT = 10;
 
     // Square gameobjects
     [SerializeField] private GameObject tetrisSquarePrefab;
     private GameObject[,] tetrisSquareGrid;
     private SpriteRenderer[,] tetrisSquareGridRenderer;
 
-    private GameObject[,] preboardSquareGrid;
-    private SpriteRenderer[,] preboardSquareGridRenderer;
-
     // Colours
     [SerializeField] private Color[] shapeColours;
-    [SerializeField] private Color preboardColour;
 
     // Game vars
     private const float TIME_STEP = 0.5f;
     Timer gameStepTimer;
+
+    TetrisPiece currentPiece; // The reference to the piece currently in play
 
     //
     // GAME LOOP
@@ -83,24 +84,6 @@ public class Tetris : Minigame
                 tetrisSquareGridRenderer[x, y] = backgroundSquare.GetComponent<SpriteRenderer>();
             }
         }
-
-        // Initialise preboard
-        preboard = new Board(PREBOARD_WIDTH, PREBOARD_HEIGHT);
-
-        preboardSquareGrid = new GameObject[BOARD_WIDTH, BOARD_HEIGHT];
-        preboardSquareGridRenderer = new SpriteRenderer[BOARD_WIDTH, BOARD_HEIGHT];
-
-        for (int x = 0; x < PREBOARD_WIDTH; x++)
-        {
-            for (int y = 0; y < PREBOARD_HEIGHT; y++)
-            {
-                GameObject backgroundSquare = Instantiate(tetrisSquarePrefab, new Vector3(x, y + BOARD_HEIGHT, 0), Quaternion.identity, squareParent.transform);
-                preboardSquareGrid[x, y] = backgroundSquare;
-
-                preboardSquareGridRenderer[x, y] = backgroundSquare.GetComponent<SpriteRenderer>();
-                preboardSquareGridRenderer[x, y].color = preboardColour;
-            }
-        }
     }
 
     private void InitShapes()
@@ -133,7 +116,7 @@ public class Tetris : Minigame
     {
         if (Input.GetMouseButtonDown(0))
         {
-            PlaceShapeIntoPreboard(GetRandomShape());
+            PlaceShapeIntoBoard(GetRandomShape());
         }
 
         if (gameStepTimer.HasReachedTarget())
@@ -172,49 +155,29 @@ public class Tetris : Minigame
                 }
             }
         }
-
-        // Move preboard down
-        // Bottom layer move to board
-        for (int x = 0; x < PREBOARD_WIDTH; x++)
-        {
-            if (preboard.board[x, 0].active)
-            {
-                preboard.board[x, 0].Sleep();
-                board.board[x, BOARD_HEIGHT - 1].WakeUp();
-            }
-        }
-
-        // Top two layers move down on preboard
-        for (int x = 0; x < PREBOARD_WIDTH; x++)
-        {
-            for (int y = 1; y < PREBOARD_HEIGHT; y++)
-            {
-                if (preboard.board[x, y].active)
-                {
-                    preboard.board[x, y].Sleep();
-                    preboard.board[x, y - 1].WakeUp();
-                }
-            }
-        }
     }
 
-    private void PlaceShapeIntoPreboard(TetrisShape shape)
+    private void PlaceShapeIntoBoard(TetrisShape shape)
     {
-        int midX = (BOARD_WIDTH / 2) - 1;
+        int midX = (BOARD_WIDTH / 2);
+        if (midX % 2 != 0)
+            midX++;
 
-        for (int y = 0; y < 3; y++)
+        for (int y = BOARD_HEIGHT - 2; y < BOARD_HEIGHT; y++)
         {
             for (int x = 0; x < 3; x++)
             {
-                if (shape.shape[(y * 3) + x] == '#')
+                if (shape.shape[((y - (BOARD_HEIGHT - 2)) * BOARD_WIDTH) + x] == '#')
                 {
-                    preboard.board[midX + x, y].WakeUp();
+                    board.board[midX + x, y].WakeUp();
+                    tetrisSquareGridRenderer[x, y].color = GetRandomColour();
                 }
             }
         }  
     }
 
     private TetrisShape GetRandomShape() { return shapes[Random.Range(0, shapes.Length)]; }
+    private Color GetRandomColour() { return shapeColours[Random.Range(0, shapeColours.Length)]; }
 
     //
     // SQUARE TOOLS
