@@ -33,6 +33,12 @@ public class Tetris : Minigame
     private GameObject[,] tetrisSquareGrid;
     private SpriteRenderer[,] tetrisSquareGridRenderer;
 
+    // Input Keys
+    [SerializeField] private KeyCode rotateAnticlockwise;
+    [SerializeField] private KeyCode rotateClockwise;
+    [SerializeField] private KeyCode moveLeft;
+    [SerializeField] private KeyCode moveRight;
+
     // Colours
     [SerializeField] private Color[] shapeColours;
 
@@ -122,20 +128,31 @@ public class Tetris : Minigame
 
     private void Update()
     {
+        // Interval between shape dropping
         if (gameStepTimer.HasReachedTarget())
         {
             gameStepTimer.ResetTimer();
 
             if (currentPiece != null)
             {
-                if (CanMovePieceDown())
-                    MovePieceDown();
+                if (CanMovePiece(BoardPosition.down))
+                    MovePiece(BoardPosition.down);
                 else
                     SpawnNextPiece();
             }
         }
         else
             gameStepTimer.AddTime(Time.deltaTime);
+
+        // Move Left
+        if (Input.GetKeyUp(moveLeft))
+            if (CanMovePiece(BoardPosition.left))
+                MovePiece(BoardPosition.left);
+
+        // Move Right
+        if (Input.GetKeyUp(moveRight))
+            if (CanMovePiece(BoardPosition.right))
+                MovePiece(BoardPosition.right);
     }
 
     private void SpawnNextPiece()
@@ -179,29 +196,40 @@ public class Tetris : Minigame
         return newPiece;
     }
 
-    private bool CanMovePieceDown()
+    private bool CanMovePiece(BoardPosition direction)
     {
-        // Check all pieces can move down
         bool obstructed = false;
 
         for (int i = 0; i < currentPiece.positions.Length; i++)
         {
-            BoardPosition below = currentPiece.positions[i] + BoardPosition.down;
+            BoardPosition movedPosition = currentPiece.positions[i] + direction;
 
-            if (!IsInbounds(below) || (!IsSelfContained(currentPiece.positions, below) && IsPieceBelow(currentPiece.positions[i])))
+            if (!IsInbounds(movedPosition) || (!IsSelfContained(currentPiece.positions, movedPosition) && IsPieceInDirection(currentPiece.positions[i], direction)))
                 obstructed = true;
         }
-        
+
         return !obstructed;
     }
 
-    private void MovePieceDown()
+    private void MovePiece(BoardPosition direction)
     {
         for (int i = 0; i < currentPiece.positions.Length; i++)
         {
-            MoveSquareDown(currentPiece.positions[i]);
-            currentPiece.positions[i] += BoardPosition.down;
-        }   
+            // Get old and new position
+            BoardPosition currentPosition = currentPiece.positions[i];
+            BoardPosition movedPosition = currentPosition + direction;
+
+            // Set old square back to colourless and sleeping
+            board.board[currentPosition.x, currentPosition.y].Sleep();
+            SetSquareColour(currentPosition, Color.white);
+
+            // Set new square to colour and awake
+            board.board[movedPosition.x, movedPosition.y].WakeUp();
+            SetSquareColour(movedPosition, currentPiece.colour);
+
+            // Update the position in the piece
+            currentPiece.positions[i] = movedPosition;
+        }
     }
 
     private TetrisShape GetRandomShape() { return shapes[Random.Range(0, shapes.Length)]; }
@@ -210,12 +238,12 @@ public class Tetris : Minigame
     //
     // SQUARE TOOLS
     //
-    private bool IsPieceBelow(BoardPosition origin)
+    private bool IsPieceInDirection(BoardPosition origin, BoardPosition direction)
     {
-        BoardPosition below = origin + BoardPosition.down;
+        BoardPosition movedPosition = origin + direction;
 
-        if (IsInbounds(below))
-            if (board.board[below.x, below.y].filled)
+        if (IsInbounds(movedPosition))
+            if (board.board[movedPosition.x, movedPosition.y].filled)
                 return true;
 
         return false;
@@ -229,13 +257,13 @@ public class Tetris : Minigame
             return false;
     }
 
-    private void MoveSquareDown(BoardPosition origin)
+    private void MoveSquare(BoardPosition origin, BoardPosition direction)
     {
-        BoardPosition below = origin + BoardPosition.down;
+        BoardPosition movedPosition = origin + direction;
 
         // Set new position to the old values
-        board.board[below.x, below.y].WakeUp();
-        SetSquareColour(below, tetrisSquareGridRenderer[origin.x, origin.y].color);
+        board.board[movedPosition.x, movedPosition.y].WakeUp();
+        SetSquareColour(movedPosition, tetrisSquareGridRenderer[origin.x, origin.y].color);
 
         // Set old values to default
         board.board[origin.x, origin.y].Sleep();
@@ -248,7 +276,7 @@ public class Tetris : Minigame
         for (int x = 0; x < BOARD_WIDTH; x++)
             // Start at 1 as the bottom row does not need to be moved down
             for (int y = 1; y < BOARD_HEIGHT; y++)
-                MoveSquareDown(new BoardPosition(x, y));
+                MoveSquare(new BoardPosition(x, y), BoardPosition.down);
     }
 
     private void SetSquareColour(BoardPosition squarePosition, Color colour)

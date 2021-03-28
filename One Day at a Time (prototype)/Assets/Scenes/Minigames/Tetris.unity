@@ -662,6 +662,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tetrisSquarePrefab: {fileID: 6155388764692659420, guid: 4ee21af313ae01e4aa22ade63558c7aa, type: 3}
+  rotateAnticlockwise: 273
+  rotateClockwise: 274
+  moveLeft: 276
+  moveRight: 275
   shapeColours:
   - {r: 0.9245283, g: 0.16135636, b: 0.16135636, a: 1}
   - {r: 0.26758367, g: 0.9245283, b: 0.16135636, a: 1}
