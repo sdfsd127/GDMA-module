@@ -75,9 +75,9 @@ public class BoardPosition
     public void DebugLog(string name = null)
     {
         if (name == null)
-            UnityEngine.Debug.Log(("X: {0}, Y: {1}", x, y));
+            UnityEngine.Debug.Log(string.Format("X: {0}, Y: {1}", x, y));
         else
-            UnityEngine.Debug.Log(("{0}| X: {1}, Y: {2}", name, x, y));
+            UnityEngine.Debug.Log(string.Format("{0}| X: {1}, Y: {2}", name, x, y));
     }
 
     //
