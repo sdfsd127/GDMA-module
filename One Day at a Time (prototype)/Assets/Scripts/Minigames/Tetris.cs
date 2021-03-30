@@ -109,8 +109,9 @@ public class Tetris : Minigame
         // Base Class
         m_MinigameName = "Tetris";
         m_DisplayedInformation = "This is Tetris.";
+        m_MinigameEndCondition = MINIGAME_END_CONDITION.AFTER_TIMER;
 
-        InitMinigame();
+        InitMinigame(30);
 
         // This Class
         InitBoard();
@@ -179,6 +180,9 @@ public class Tetris : Minigame
 
     private void Update()
     {
+        // Update Minigame
+        base.UpdateMinigame();
+
         // Interval between shape dropping
         if (gameStepTimer.HasReachedTarget())
         {

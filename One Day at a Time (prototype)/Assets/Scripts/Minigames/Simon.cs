@@ -39,6 +39,7 @@ public class Simon : Minigame
         // Base Class
         m_MinigameName = "Simon";
         m_DisplayedInformation = "This is Simon.";
+        m_MinigameEndCondition = MINIGAME_END_CONDITION.WIN_LOSE;
 
         InitMinigame();
 

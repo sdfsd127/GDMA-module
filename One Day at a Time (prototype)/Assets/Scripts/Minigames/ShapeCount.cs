@@ -38,8 +38,9 @@ public class ShapeCount : Minigame
         // Base Class
         m_MinigameName = "Shape Counting";
         m_DisplayedInformation = "This is Shape Counting.";
+        m_MinigameEndCondition = MINIGAME_END_CONDITION.BEFORE_TIMER;
 
-        InitMinigame();
+        InitMinigame(30);
 
         // This Class
         shapes = new List<GameObject>();
