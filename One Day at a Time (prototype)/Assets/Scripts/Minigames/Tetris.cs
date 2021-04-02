@@ -6,80 +6,71 @@ public class Tetris : Minigame
 {
     private class TetrisShape
     {
-        public bool[] chunks;
+        public bool[] m_Chunks;
 
-        public TetrisShape(string shape)
+        public TetrisShape(string shape, char chunkKey)
         {
-            chunks = new bool[9];
+            m_Chunks = new bool[9];
 
-            for (int i = 0; i < chunks.Length; i++)
-                if (shape[i] == '#')
-                    chunks[i] = true;
+            for (int i = 0; i < m_Chunks.Length; i++)
+                if (shape[i] == chunkKey)
+                    m_Chunks[i] = true;
         }
 
         public TetrisShape(bool[] shape)
         {
-            chunks = new bool[9];
+            m_Chunks = new bool[9];
 
-            for (int i = 0; i < chunks.Length; i++)
+            for (int i = 0; i < m_Chunks.Length; i++)
                 if (shape[i])
-                    chunks[i] = true;
+                    m_Chunks[i] = true;
         }
 
         public void RotateShape()
         {
-            bool[] duplicateChunks = chunks;
+            bool[] duplicateChunks = new bool[9];
+            for (int i = 0; i < m_Chunks.Length; i++)
+                duplicateChunks[i] = (m_Chunks[i]) ? true : false;
 
-            chunks[0] = duplicateChunks[2];
-            chunks[1] = duplicateChunks[5];
-            chunks[2] = duplicateChunks[8];
+            m_Chunks[0] = duplicateChunks[2];
+            m_Chunks[1] = duplicateChunks[5];
+            m_Chunks[2] = duplicateChunks[8];
 
-            chunks[3] = duplicateChunks[1];
-            chunks[5] = duplicateChunks[7];
+            m_Chunks[3] = duplicateChunks[1];
+            // chunks[4] = duplicateChunks[4]; // Redundant -> but serves to explain the process
+            m_Chunks[5] = duplicateChunks[7];
 
-            chunks[6] = duplicateChunks[0];
-            chunks[7] = duplicateChunks[3];
-            chunks[8] = duplicateChunks[6];
+            m_Chunks[6] = duplicateChunks[0];
+            m_Chunks[7] = duplicateChunks[3];
+            m_Chunks[8] = duplicateChunks[6];
         }
     }
     private TetrisShape[] shapes;
 
     private class TetrisPiece
     {
-        public TetrisShape shape;
-        public Color colour;
+        public TetrisShape m_Shape;
+        public Color m_Colour;
 
-        public BoardPosition[] positions;
+        public BoardPosition m_Origin;
+        public BoardPosition[] m_BoardPositionsClaimed;
+
+        public TetrisPiece(BoardPosition origin)
+        {
+            m_Origin = origin;
+        }
 
         public void RotatePiece()
         {
-            shape.RotateShape();
+            m_Shape.RotateShape();
 
             UpdateSquarePositions();
         }
 
         private void UpdateSquarePositions()
         {
-            // Find point at which the shape begins -> (0,0) origin
-            BoardPosition originPoint = GetLowestPoint();
-
-            // Get position array
-            positions = TranslateShapeToPositionArray(shape.chunks, originPoint);
-        }
-
-        public BoardPosition GetLowestPoint()
-        {
-            BoardPosition currentLowest = new BoardPosition(int.MaxValue, int.MaxValue);
-
-            for (int i = 0; i < positions.Length; i++)
-            {
-                if (positions[i].x < currentLowest.x)
-                    currentLowest.x = positions[i].x;
-                if (positions[i].y < currentLowest.y)
-                    currentLowest.y = positions[i].y;
-            }
-
-            return currentLowest;
+            // Get position array and update the currently claimed board squares
+            m_BoardPositionsClaimed = TranslateShapeToPositionArray(m_Shape.m_Chunks, m_Origin);
         }
 
         private void PrintDebug(BoardPosition[] original, BoardPosition[] copy)
@@ -118,11 +109,10 @@ public class Tetris : Minigame
     [SerializeField] private Color[] shapeColours;
 
     // Game vars
+    private BoardPosition shapesOrigin;
     private const float TIME_STEP = 0.5f;
     Timer gameStepTimer;
-
     [SerializeField] private bool SHOW_FIRST_THREE; // Whether or not to render the first three rows of the tetris shape
-
     TetrisPiece currentPiece; // The reference to the piece currently in play
 
     //
@@ -174,19 +164,22 @@ public class Tetris : Minigame
                     tetrisSquareGridRenderer[x, y].enabled = false;
             }
         }
+
+        // Initialise spawn point of shapes on board
+        shapesOrigin = new BoardPosition((BOARD_WIDTH / 2) - 2, BOARD_HEIGHT - 4);
     }
 
     private void InitShapes()
     {
         List<TetrisShape> shapesList = new List<TetrisShape>();
 
-        shapesList.Add(new TetrisShape("~~~~##~##")); // O Shape
-        shapesList.Add(new TetrisShape("~#~~#~~#~")); // I Shape
-        shapesList.Add(new TetrisShape("~~~##~~##")); // S Shape
-        shapesList.Add(new TetrisShape("~~~~####~")); // Z Shape
-        shapesList.Add(new TetrisShape("~##~#~~#~")); // L Shape
-        shapesList.Add(new TetrisShape("##~~#~~#~")); // J Shape
-        shapesList.Add(new TetrisShape("~#~###~~~")); // T Shape
+        shapesList.Add(new TetrisShape("~~~~##~##", '#')); // O Shape
+        shapesList.Add(new TetrisShape("~#~~#~~#~", '#')); // I Shape
+        shapesList.Add(new TetrisShape("~~~##~~##", '#')); // S Shape
+        shapesList.Add(new TetrisShape("~~~~####~", '#')); // Z Shape
+        shapesList.Add(new TetrisShape("~##~#~~#~", '#')); // L Shape
+        shapesList.Add(new TetrisShape("##~~#~~#~", '#')); // J Shape
+        shapesList.Add(new TetrisShape("~#~###~~~", '#')); // T Shape
 
         shapes = shapesList.ToArray();
     }
@@ -213,17 +206,21 @@ public class Tetris : Minigame
         {
             gameStepTimer.ResetTimer();
 
+            // Spawn the next piece in if there isnt one
+            if (currentPiece == null)
+            {
+                SpawnNextPiece();
+            }
+
             if (CanMovePiece(BoardPosition.down))
                 MovePiece(BoardPosition.down);
             else
             {
-                if (!GameOver())
-                {
-                    CheckForFilledRows();
-                    SpawnNextPiece();
-                }
-                else
-                    MinigameLost();
+                // Piece is no longer moving -> deactivate and delink
+                currentPiece = null;
+
+                // Check for any rows that have now been filled in and remove them
+                CheckForFilledRows();
             }
         }
         else
@@ -260,8 +257,15 @@ public class Tetris : Minigame
         currentPiece = GetNewPiece();
 
         // Set the squares on the grid that pieces colour
-        for (int i = 0; i < currentPiece.positions.Length; i++)
-            SetSquareColour(currentPiece.positions[i], currentPiece.colour);
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
+        {
+            ActivateSquare(currentPiece.m_BoardPositionsClaimed[i]);
+            SetSquareColour(currentPiece.m_BoardPositionsClaimed[i], currentPiece.m_Colour);
+        }
+        
+        // Check if the piece will fit on the board if spawned
+        if (!CanSpawnShape(currentPiece.m_Shape))
+            MinigameLost(); // If not then the player has lot
     }
 
     private TetrisPiece GetNewPiece()
@@ -271,15 +275,15 @@ public class Tetris : Minigame
         Color randomColour = GetRandomColour();
 
         // Create the piece representative
-        TetrisPiece newPiece = new TetrisPiece();
-        newPiece.shape = randomShape;
-        newPiece.colour = randomColour;
+        TetrisPiece newPiece = new TetrisPiece(new BoardPosition(shapesOrigin));
+        newPiece.m_Shape = randomShape;
+        newPiece.m_Colour = randomColour;
 
         // Add positions to shape
         int startX = (BOARD_WIDTH / 2) - 1;
         int startY = BOARD_HEIGHT - 3 - 1;
 
-        newPiece.positions = TranslateShapeToPositionArray(newPiece.shape.chunks, new BoardPosition(startX, startY));
+        newPiece.m_BoardPositionsClaimed = TranslateShapeToPositionArray(newPiece.m_Shape.m_Chunks, new BoardPosition(startX, startY));
 
         // Return the piece
         return newPiece;
@@ -292,11 +296,11 @@ public class Tetris : Minigame
 
         bool obstructed = false;
 
-        for (int i = 0; i < currentPiece.positions.Length; i++)
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
         {
-            BoardPosition movedPosition = currentPiece.positions[i] + direction;
+            BoardPosition movedPosition = currentPiece.m_BoardPositionsClaimed[i] + direction;
 
-            if (!IsInbounds(movedPosition) || (!IsSelfContained(currentPiece.positions, movedPosition) && IsPieceInDirection(currentPiece.positions[i], direction)))
+            if (!IsInbounds(movedPosition) || (!IsSelfContained(currentPiece.m_BoardPositionsClaimed, movedPosition) && IsPieceInDirection(currentPiece.m_BoardPositionsClaimed[i], direction)))
                 obstructed = true;
         }
 
@@ -305,26 +309,28 @@ public class Tetris : Minigame
 
     private void MovePiece(BoardPosition direction)
     {
-        for (int i = 0; i < currentPiece.positions.Length; i++)
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
         {
             // Get old position
-            BoardPosition currentPosition = currentPiece.positions[i];
+            BoardPosition currentPosition = currentPiece.m_BoardPositionsClaimed[i];
 
             // Set old square back to colourless and sleeping
             DeactivateSquare(currentPosition);
         }
 
-        for (int i = 0; i < currentPiece.positions.Length; i++)
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
         {
             // Get new position
-            BoardPosition movedPosition = currentPiece.positions[i] + direction;
+            BoardPosition movedPosition = currentPiece.m_BoardPositionsClaimed[i] + direction;
 
             // Set new square to colour and awake
             ActivateSquare(movedPosition);
 
             // Update the position in the piece
-            currentPiece.positions[i] = movedPosition;
+            currentPiece.m_BoardPositionsClaimed[i] = movedPosition;
         }
+
+        currentPiece.m_Origin += direction;
     }
 
     private bool CanRotatePiece()
@@ -336,22 +342,21 @@ public class Tetris : Minigame
         bool canRotate = true;
 
         // Get origin of piece on board
-        BoardPosition shapeOrigin = currentPiece.GetLowestPoint();
-        shapeOrigin.DebugLog();
+        BoardPosition shapeOrigin = new BoardPosition(currentPiece.m_Origin.x, currentPiece.m_Origin.y);
         
         // Can't rotate pieces on outer edges of level
         if (shapeOrigin.x == 0 || shapeOrigin.x == BOARD_WIDTH - 1)
             return false;
 
         // Copy the shape and rotate it on the local copy
-        TetrisShape shapeCopy = currentPiece.shape;
+        TetrisShape shapeCopy = new TetrisShape(currentPiece.m_Shape.m_Chunks);
         shapeCopy.RotateShape();
 
         // Check if each chunk would fit if rotated
-        for (int i = 0; i < shapeCopy.chunks.Length; i++)
+        for (int i = 0; i < shapeCopy.m_Chunks.Length; i++)
         {
             // Check if the chunk is necessary and then if it would be taken in the board
-            if (shapeCopy.chunks[i] && board.board[shapeOrigin.x + (i % 3), shapeOrigin.y + ((int)Mathf.Floor(i / 3))].filled)
+            if (shapeCopy.m_Chunks[i] && board.board[shapeOrigin.x + (i % 3), shapeOrigin.y + ((int)Mathf.Floor(i / 3))].filled)
                 canRotate = false;
         }
 
@@ -361,15 +366,15 @@ public class Tetris : Minigame
     private void RotatePiece()
     {
         // Set old squares to empty and colourless
-        for (int i = 0; i < currentPiece.positions.Length; i++)
-            DeactivateSquare(currentPiece.positions[i]);
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
+            DeactivateSquare(currentPiece.m_BoardPositionsClaimed[i]);
 
         // Rotate the piece 90 degrees clockwise
         currentPiece.RotatePiece();
 
         // Set new squares to colour and filled
-        for (int i = 0; i < currentPiece.positions.Length; i++)
-            ActivateSquare(currentPiece.positions[i]);
+        for (int i = 0; i < currentPiece.m_BoardPositionsClaimed.Length; i++)
+            ActivateSquare(currentPiece.m_BoardPositionsClaimed[i]);
     }
 
     private TetrisShape GetRandomShape() { return shapes[Random.Range(0, shapes.Length)]; }
@@ -428,12 +433,15 @@ public class Tetris : Minigame
         // Loop through this process for as many rows as has been filled
         for (int i = 0; i < rowsFilled.Length; i++)
         {
-            // Remove the bottom row
+            // Get the Y level of this current row
+            int currentRowY = rowsFilled[i] - i; // Account for rows already removed with (i)
+
+            // Remove the row that was filled
             for (int x = 0; x < BOARD_WIDTH; x++)
-                DeactivateSquare(new BoardPosition(x, rowsFilled[i] - i));
+                DeactivateSquare(new BoardPosition(x, currentRowY));
 
             // Move all squares down
-            MoveAllSquaresDown(rowsFilled[i] - i);
+            MoveAllSquaresDown(currentRowY);
         }
     }
 
@@ -449,7 +457,7 @@ public class Tetris : Minigame
     private void ActivateSquare(BoardPosition position)
     {
         board.board[position.x, position.y].WakeUp();
-        SetSquareColour(position, currentPiece.colour);
+        SetSquareColour(position, currentPiece.m_Colour);
     }
 
     private bool IsPieceInDirection(BoardPosition origin, BoardPosition direction)
@@ -510,13 +518,21 @@ public class Tetris : Minigame
         return false;
     }
 
-    private bool GameOver()
+    private bool CanSpawnShape(TetrisShape shape)
     {
-        for (int x = 0; x < BOARD_WIDTH; x++)
-            if (board.board[x, BOARD_HEIGHT - 3].filled)
-                return true;
+        BoardPosition[] squaresRequired = TranslateShapeToPositionArray(shape.m_Chunks, shapesOrigin);
 
-        return false;
+        bool canSpawn = true;
+
+        for (int i = 0; i < squaresRequired.Length; i++)
+        {
+            BoardPosition currentSquare = squaresRequired[i];
+
+            if (board.board[currentSquare.x, currentSquare.y].filled)
+                canSpawn = false;
+        }
+
+        return canSpawn;
     }
 
     // 

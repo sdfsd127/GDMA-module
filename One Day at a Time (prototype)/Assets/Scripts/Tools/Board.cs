@@ -72,6 +72,12 @@ public class BoardPosition
         y = (int)y_;
     }
 
+    public BoardPosition(BoardPosition bp)
+    {
+        x = bp.x;
+        y = bp.y;
+    }
+
     public void DebugLog(string name = null)
     {
         if (name == null)
