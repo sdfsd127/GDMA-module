@@ -3,6 +3,18 @@
     private float m_ElapsedTime;
     private float m_TargetTime;
 
+    public Timer()
+    {
+        m_ElapsedTime = 0.0f;
+        m_TargetTime = 0.0f;
+    }
+
+    public Timer(float targetTime)
+    {
+        m_ElapsedTime = 0.0f;
+        m_TargetTime = targetTime;
+    }
+
     public float GetPercentElapsed()
     {
         return m_ElapsedTime / m_TargetTime;
@@ -40,7 +52,7 @@
 
     public void AddTime(float time)
     {
-        m_TargetTime += time;
+        m_ElapsedTime += time;
     }
 
     public void ResetTimer()

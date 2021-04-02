@@ -54,23 +54,47 @@ public class Tetris : Minigame
         public void RotatePiece()
         {
             shape.RotateShape();
-            RotatePositions();
+
+            UpdateSquarePositions();
         }
 
-        private void RotatePositions()
+        private void UpdateSquarePositions()
         {
-            BoardPosition[] duplicatePositions = positions;
+            // Find point at which the shape begins -> (0,0) origin
+            BoardPosition originPoint = GetLowestPoint();
 
-            positions[0] = duplicatePositions[2];
-            positions[1] = duplicatePositions[5];
-            positions[2] = duplicatePositions[8];
+            // Get position array
+            positions = TranslateShapeToPositionArray(shape.chunks, originPoint);
+        }
 
-            positions[3] = duplicatePositions[1];
-            positions[5] = duplicatePositions[7];
+        public BoardPosition GetLowestPoint()
+        {
+            BoardPosition currentLowest = new BoardPosition(int.MaxValue, int.MaxValue);
 
-            positions[6] = duplicatePositions[0];
-            positions[7] = duplicatePositions[3];
-            positions[8] = duplicatePositions[6];
+            for (int i = 0; i < positions.Length; i++)
+            {
+                if (positions[i].x < currentLowest.x)
+                    currentLowest.x = positions[i].x;
+                if (positions[i].y < currentLowest.y)
+                    currentLowest.y = positions[i].y;
+            }
+
+            return currentLowest;
+        }
+
+        private void PrintDebug(BoardPosition[] original, BoardPosition[] copy)
+        {
+            Debug.Log("ORIG| L: " + original.Length);
+            for (int i = 0; i < original.Length; i++)
+            {
+                Debug.Log("ORIG| " + i + ": " + original[i].x + ", " + original[i].x);
+            }
+
+            Debug.Log("COPY| L: " + copy.Length);
+            for (int i = 0; i < copy.Length; i++)
+            {
+                Debug.Log("COPY| " + i + ": " + copy[i].x + ", " + copy[i].x);
+            }
         }
     }
 
@@ -170,6 +194,7 @@ public class Tetris : Minigame
     private void InitTetris()
     {
         gameStepTimer = new Timer();
+        gameStepTimer.SetElapsedTime(0);
         gameStepTimer.SetTargetTime(TIME_STEP);
     }
 
@@ -192,10 +217,14 @@ public class Tetris : Minigame
                 MovePiece(BoardPosition.down);
             else
             {
-                CheckForFilledRows();
-                SpawnNextPiece();
+                if (!GameOver())
+                {
+                    CheckForFilledRows();
+                    SpawnNextPiece();
+                }
+                else
+                    MinigameLost();
             }
-                
         }
         else
             gameStepTimer.AddTime(Time.deltaTime);
@@ -246,21 +275,11 @@ public class Tetris : Minigame
         newPiece.shape = randomShape;
         newPiece.colour = randomColour;
 
-        // Translate shape to positions
-        List<BoardPosition> positionsList = new List<BoardPosition>();
-
+        // Add positions to shape
         int startX = (BOARD_WIDTH / 2) - 1;
         int startY = BOARD_HEIGHT - 3 - 1;
 
-        for (int i = 0; i < randomShape.chunks.Length; i++)
-        {
-            // If # in shape code then that position is part of the shape
-            if (randomShape.chunks[i] == true)
-                positionsList.Add(new BoardPosition(startX + (i % 3), startY + ((int)Mathf.Floor(i / 3))));
-        }
-
-        // Add positions to shape
-        newPiece.positions = positionsList.ToArray();
+        newPiece.positions = TranslateShapeToPositionArray(newPiece.shape.chunks, new BoardPosition(startX, startY));
 
         // Return the piece
         return newPiece;
@@ -317,7 +336,7 @@ public class Tetris : Minigame
         bool canRotate = true;
 
         // Get origin of piece on board
-        BoardPosition shapeOrigin = GetLowestPoint(currentPiece.positions);
+        BoardPosition shapeOrigin = currentPiece.GetLowestPoint();
         shapeOrigin.DebugLog();
         
         // Can't rotate pieces on outer edges of level
@@ -336,7 +355,6 @@ public class Tetris : Minigame
                 canRotate = false;
         }
 
-        Debug.Log(canRotate);
         return canRotate;
     }
 
@@ -492,18 +510,30 @@ public class Tetris : Minigame
         return false;
     }
 
-    private BoardPosition GetLowestPoint(BoardPosition[] array)
+    private bool GameOver()
     {
-        BoardPosition currentLowest = new BoardPosition(int.MaxValue, int.MaxValue);
+        for (int x = 0; x < BOARD_WIDTH; x++)
+            if (board.board[x, BOARD_HEIGHT - 3].filled)
+                return true;
 
-        for (int i = 0; i < array.Length; i++)
+        return false;
+    }
+
+    // 
+    // STATICS
+    //
+
+    public static BoardPosition[] TranslateShapeToPositionArray(bool[] chunks, BoardPosition origin)
+    {
+        // Translate shape to positions
+        List<BoardPosition> positionsList = new List<BoardPosition>();
+
+        for (int i = 0; i < chunks.Length; i++)
         {
-            if (array[i].x < currentLowest.x)
-                currentLowest.x = array[i].x;
-            if (array[i].y < currentLowest.y)
-                currentLowest.y = array[i].y;
+            if (chunks[i] == true)
+                positionsList.Add(new BoardPosition(origin.x + (i % 3), origin.y + ((int)Mathf.Floor(i / 3))));
         }
 
-        return currentLowest;
+        return positionsList.ToArray();
     }
 }
