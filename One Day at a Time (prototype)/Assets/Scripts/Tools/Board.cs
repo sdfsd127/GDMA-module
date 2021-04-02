@@ -2,22 +2,26 @@
 {
     public class Boardspace
     {
-        public BoardPosition position;
-        public bool filled;
-        public bool active;
+        public BoardPosition m_Position;
+        public UnityEngine.Color m_Colour;
+
+        public bool m_Filled;
+        public bool m_Active;
 
         public Boardspace()
         {
-
+            m_Colour = UnityEngine.Color.white;
         }
 
-        public Boardspace(BoardPosition position_)
+        public Boardspace(BoardPosition position)
         {
-            position = position_;
+            m_Position = position;
+            m_Colour = UnityEngine.Color.white;
         }
 
-        public void SetFilledState(bool state) { filled = state; }
-        public void SetActiveState(bool state) { active = state; }
+        public void SetFilledState(bool state) { m_Filled = state; }
+        public void SetActiveState(bool state) { m_Active = state; }
+        public void SetColour(UnityEngine.Color colour) { m_Colour = colour; }
 
         public void WakeUp()
         {
