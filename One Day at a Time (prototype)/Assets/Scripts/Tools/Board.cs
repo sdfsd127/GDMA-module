@@ -100,8 +100,10 @@ public class BoardPosition
     public static bool operator ==(BoardPosition left, BoardPosition right) { return (left.x == right.x && left.y == right.y); }
     public static bool operator !=(BoardPosition left, BoardPosition right) { return !(left == right); }
 
-    public static BoardPosition up = new BoardPosition(0, 1);
-    public static BoardPosition down = new BoardPosition(0, -1);
-    public static BoardPosition right = new BoardPosition(1, 0);
-    public static BoardPosition left = new BoardPosition(-1, 0);
+    public static BoardPosition up      = new BoardPosition(0, 1);
+    public static BoardPosition down    = new BoardPosition(0, -1);
+    public static BoardPosition right   = new BoardPosition(1, 0);
+    public static BoardPosition left    = new BoardPosition(-1, 0);
+
+    public static BoardPosition zero    = new BoardPosition(0, 0);
 }
