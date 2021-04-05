@@ -76,4 +76,9 @@ public class Minigame : MonoBehaviour
     {
         m_Timer.SetTargetTime(endTime);
     }
+
+    protected float GetTimerElapsedTime()
+    {
+        return m_Timer.GetElapsedTime();
+    }
 }
