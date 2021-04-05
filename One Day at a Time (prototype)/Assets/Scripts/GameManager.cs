@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -111,6 +112,18 @@ public class GameManager : MonoBehaviour
     public void FillGauge(int gaugeIndex)
     {
         GainGaugeResource(gaugeIndex, 20);
+    }
+
+    public void PlayRandomMinigame()
+    {
+        string minigameName = minigames[Random.Range(0, minigames.Length)];
+
+        PlayMinigame(minigameName);
+    }
+
+    public void PlayMinigame(string name)
+    {
+        SceneManager.LoadScene(name);
     }
 
     //

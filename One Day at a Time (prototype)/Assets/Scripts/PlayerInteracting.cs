@@ -22,7 +22,7 @@ public class PlayerInteracting : MonoBehaviour
 
         if (Input.GetKeyUp(interactKey) && isInRangeOfInteractable)
         {
-            currentInteractableCollider.GetComponent<InteractableBuilding>().PrintHello();
+            currentInteractableCollider.GetComponent<InteractableBuilding>().Interact();
         }
     }
 

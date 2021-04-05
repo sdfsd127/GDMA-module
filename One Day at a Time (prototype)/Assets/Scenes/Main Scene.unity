@@ -309,8 +309,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a7e3ef7b1eea744fb165a56db0f05fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactKey: 101
   interactRange: 2.5
-  layerIndex: 9
 --- !u!1 &471121446
 GameObject:
   m_ObjectHideFlags: 0

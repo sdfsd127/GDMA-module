@@ -30,6 +30,8 @@ public class Simon : Minigame
     private const int MAX_COUNT = 5;
     private const float TIME_BETWEEN_FADE_CYCLE = 0.25f;
     private const float TIME_HIGHLIGHTED = 0.5f;
+
+    [SerializeField] private Text numberCompletedText;
     
     //
     // GAME LOOP
@@ -53,6 +55,8 @@ public class Simon : Minigame
         currentCount = 0;
 
         // Begin
+        UpdateNumberCompleted();
+
         AddNewColour();
         DisplayCurrentPattern();
     }
@@ -148,6 +152,11 @@ public class Simon : Minigame
             ResetSegment(i);
     }
 
+    private void UpdateNumberCompleted()
+    {
+        numberCompletedText.text = currentCount + " / " + MAX_COUNT;
+    }
+
     //
     // CO-ROUTINES
     //
@@ -195,6 +204,8 @@ public class Simon : Minigame
                         MinigameWon();
                     else
                     {
+                        UpdateNumberCompleted();
+
                         AddNewColour();
                         DisplayCurrentPattern();
                     }

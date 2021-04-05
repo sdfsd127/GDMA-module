@@ -28,7 +28,6 @@ public class Minigame : MonoBehaviour
 
     protected void InitMinigame(float timerTarget = 0.0f)
     {
-        SetDisplayInformation();
         SetEndConditionTimerTarget(timerTarget);
     }
 
@@ -53,22 +52,17 @@ public class Minigame : MonoBehaviour
             }
     }
 
-    protected void SetDisplayInformation()
-    {
-        GameObject infoPanel = GameObject.Find("Info Panel");
-        infoPanel.transform.GetChild(0).GetComponent<Text>().text = m_MinigameName;
-        infoPanel.transform.GetChild(1).GetComponent<Text>().text = m_DisplayedInformation;
-    }
-
     protected void MinigameLost()
     {
         Completed = false;
+        Debug.Log("MINIGAME LOST");
         SceneManager.LoadScene("Main Scene");
     }
 
     protected void MinigameWon()
     {
         Completed = true;
+        Debug.Log("MINIGAME WON");
         SceneManager.LoadScene("Main Scene");
     }
 

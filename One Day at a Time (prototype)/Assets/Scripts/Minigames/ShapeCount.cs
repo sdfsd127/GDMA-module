@@ -18,17 +18,28 @@ public class ShapeCount : Minigame
     private const float BOUND = 4.0f;
     private Vector2 UPPER_LEFT = new Vector2(-BOUND, BOUND);
     private Vector2 BOTTOM_RIGHT = new Vector2(BOUND, -BOUND);
+    private Vector2 OFFSET = new Vector2(0.0f, 1.0f);
 
     private const float MAX_TIME_ALLOWED = 30.0f;
     private float currentTime;
 
     [SerializeField] private Text timeText;
+    [SerializeField] private Text shapeText;
+    [SerializeField] private Text scoreText;
     [SerializeField] private Text optionAText;
     [SerializeField] private Text optionBText;
     private bool a_IsCorrectOption;
 
     private int timesCorrect;
     private const int MAX_TIMES_CORRECT = 5;
+
+    private enum SHAPE
+    {
+        CIRCLE = 0,
+        SQUARE = 1,
+        TRIANGLE = 2
+    }
+    private SHAPE relevantShape;
 
     //
     // GAME LOOP
@@ -65,6 +76,9 @@ public class ShapeCount : Minigame
 
         // Calculate and create the shapes
         SpawnNewShapes();
+
+        // Pick which shape to count
+        PickRelevantShape();
 
         // Set the onscreen UI options
         SetOptions();
@@ -115,9 +129,24 @@ public class ShapeCount : Minigame
         shapes.Add(newShape);
     }
 
+    private void PickRelevantShape()
+    {
+        SHAPE shape = (SHAPE)(Random.Range(0, 3));
+        relevantShape = shape;
+
+        shapeText.text = "Count the Number of: ";
+
+        if (shape == SHAPE.CIRCLE)
+            shapeText.text += "CIRCLES";
+        else if (shape == SHAPE.SQUARE)
+            shapeText.text += "SQUARES";
+        else if (shape == SHAPE.TRIANGLE)
+            shapeText.text += "TRIANGLES";
+    }
+
     private void SetOptions()
     {
-        int trueOption = circleCount;
+        int trueOption = GetTrueOption();
         int fakeShift = Random.Range(1, (trueOption / 10) * 1);
         if (FiftyFifty())
             fakeShift *= -1;
@@ -137,12 +166,32 @@ public class ShapeCount : Minigame
         }
     }
 
+    private int GetTrueOption()
+    {
+        switch (relevantShape)
+        {
+            case SHAPE.CIRCLE:
+                return circleCount;
+            case SHAPE.SQUARE:
+                return squareCount;
+            case SHAPE.TRIANGLE:
+                return triangleCount;
+            default:
+                return 0;
+        }
+    }
+
+    private void UpdateNumberCorrect() 
+    {
+        scoreText.text = timesCorrect + " / " + MAX_TIMES_CORRECT;
+    }
+
     //
     // TOOLS
     //
     private Vector3 GetRandomInboundsPosition()
     {
-        return new Vector3(Random.Range(UPPER_LEFT.x, BOTTOM_RIGHT.x), Random.Range(BOTTOM_RIGHT.y, UPPER_LEFT.y), 0);
+        return new Vector3(Random.Range(UPPER_LEFT.x, BOTTOM_RIGHT.x) + OFFSET.x, Random.Range(BOTTOM_RIGHT.y, UPPER_LEFT.y) + OFFSET.y, 0);
     }
 
     private bool FiftyFifty()
@@ -176,7 +225,10 @@ public class ShapeCount : Minigame
             if (timesCorrect >= MAX_TIMES_CORRECT)
                 MinigameWon();
             else
+            {
+                UpdateNumberCorrect();
                 NewSetup();
+            }
         }
         else
             MinigameLost();

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class InteractableBuilding : MonoBehaviour
 {
-    public void PrintHello()
+    public void Interact()
     {
-        Debug.Log("HELLO");
+        GameManager.Instance.PlayRandomMinigame();
     }
 }
