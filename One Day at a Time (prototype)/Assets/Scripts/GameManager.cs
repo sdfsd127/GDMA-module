@@ -23,6 +23,9 @@ public class GameManager : MonoBehaviour
     // Cursor Control
     public static bool CURSOR_ACTIVE = true;
 
+    // Names of the scenes of the minigames
+    [SerializeField] private string[] minigames;
+
     private void Awake()
     {
         if (Instance == null)

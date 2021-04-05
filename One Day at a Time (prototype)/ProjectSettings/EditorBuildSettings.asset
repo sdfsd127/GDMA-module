@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Minigames/Count the Shape.unity
     guid: 39d2f3730d0d76a40acc50f6eff96bcb
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Tetris.unity
+    guid: d45897c1046af994d889afcdc4ea063a
   m_configObjects: {}

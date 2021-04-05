@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class InteractableBuilding : MonoBehaviour
 {
-
+    public void PrintHello()
+    {
+        Debug.Log("HELLO");
+    }
 }

@@ -55,6 +55,9 @@
     }
 }
 
+// Disable .Equals and .Hash overload warning
+#pragma warning disable 0660
+#pragma warning disable 0661
 public class BoardPosition
 {
     public int x;
