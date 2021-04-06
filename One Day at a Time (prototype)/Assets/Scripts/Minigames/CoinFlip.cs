@@ -8,8 +8,8 @@ public class CoinFlip : Minigame
     private const int MAX_TIMES_CORRECT = 3;
     private int currentTimesCorrect;
 
-    private const int MAX_ROTATIONS = 12;
-    private const int MIN_ROTATIONS = 3;
+    private const int MAX_ROTATIONS = 7;
+    private const int MIN_ROTATIONS = 2;
 
     private const float TIME_BETWEEN_ROT = 0.02f;
     private const int ROT_SPEED = 12;
@@ -23,8 +23,9 @@ public class CoinFlip : Minigame
         HEADS = 0,
         TAILS = 1
     }
-    private SIDE sideChosen;
-    private SIDE currentSide;
+
+    private SIDE playerSideChoice;
+    private SIDE coinCurrentSideShowing;
 
     private void Start()
     {
@@ -42,23 +43,35 @@ public class CoinFlip : Minigame
     private void InitCoinFlip()
     {
         currentTimesCorrect = 0;
-        currentSide = SIDE.TAILS;
+        coinCurrentSideShowing = SIDE.TAILS;
         UpdateCorrectTextUI();
     }
 
     private void FlipCoin()
     {
+        // Decide the outcome randomly
         SIDE decidedSide = GetRandomSide();
         int rotationsToMake = Random.Range(MIN_ROTATIONS, MAX_ROTATIONS + 1);
 
-        StartCoroutine(RotateCoin(rotationsToMake, (decidedSide == currentSide) ? false : true));
+        // Setup bool for whether the coin needs an extra 180 to show the decided side or not
+        bool extraFlip = false;
+        if (decidedSide != coinCurrentSideShowing)
+            extraFlip = true;
+
+        // Set the outcome
+        coinCurrentSideShowing = decidedSide;
+
+        // Visualise the flips
+        StartCoroutine(RotateCoin(rotationsToMake, extraFlip));
     }
 
     private IEnumerator RotateCoin(int numberOfRotations, bool flip)
     {
+        int degreesPerRotation = 360;
+
         for (int i = 0; i < numberOfRotations; i++)
         {
-            for (int j = 0; j < 180; j += ROT_SPEED)
+            for (int j = 0; j < degreesPerRotation; j += ROT_SPEED)
             {
                 coinObject.transform.eulerAngles += new Vector3(0, ROT_SPEED, 0);
                 yield return new WaitForSeconds(TIME_BETWEEN_ROT);
@@ -93,7 +106,7 @@ public class CoinFlip : Minigame
 
     private bool GuessedCorrect()
     {
-        if (sideChosen == currentSide)
+        if (playerSideChoice == coinCurrentSideShowing)
             return true;
         else
             return false;
@@ -120,13 +133,13 @@ public class CoinFlip : Minigame
     //
     public void HeadsPressed()
     {
-        sideChosen = SIDE.HEADS;
+        playerSideChoice = SIDE.HEADS;
         FlipCoin();
     }
 
     public void TailsPressed()
     {
-        sideChosen = SIDE.TAILS;
+        playerSideChoice = SIDE.TAILS;
         FlipCoin();
     }
 }
