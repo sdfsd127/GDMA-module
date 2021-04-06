@@ -370,6 +370,7 @@ MonoBehaviour:
   - Count the Shape
   - Simon
   - Tetris
+  - Target Clicker
 --- !u!1 &479902628
 GameObject:
   m_ObjectHideFlags: 0

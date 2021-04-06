@@ -51,7 +51,7 @@ public class ShapeCount : Minigame
         m_DisplayedInformation = "This is Shape Counting.";
         m_MinigameEndCondition = MINIGAME_END_CONDITION.BEFORE_TIMER;
 
-        InitMinigame(30);
+        InitMinigame(MAX_TIME_ALLOWED);
 
         // This Class
         shapes = new List<GameObject>();
