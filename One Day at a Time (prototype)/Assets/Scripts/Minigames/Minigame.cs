@@ -28,6 +28,8 @@ public class Minigame : MonoBehaviour
 
     protected void InitMinigame(float timerTarget = 0.0f)
     {
+        ControlCursor();
+
         SetEndConditionTimerTarget(timerTarget);
     }
 
@@ -64,6 +66,14 @@ public class Minigame : MonoBehaviour
         Completed = true;
         Debug.Log("MINIGAME WON");
         SceneManager.LoadScene("Main Scene");
+    }
+
+    private void ControlCursor()
+    {
+        if (!Completed)
+            CursorControl.SetCursorState(CursorLockMode.None, true);
+        else
+            CursorControl.SetCursorState(CursorLockMode.Locked, false);
     }
 
     private void SetEndConditionTimerTarget(float endTime)

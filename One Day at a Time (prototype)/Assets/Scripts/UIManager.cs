@@ -29,10 +29,10 @@ public class UIManager : MonoBehaviour
         gaugeImages[gaugeIndex].fillAmount = Mathf.Clamp(percent, 0.0f, 1.0f);
     }
 
-    public void SetTime(int currentTime, bool am)
+    public void SetTime(int hour, int minute, bool am)
     {
         if (timeText != null && timeText.text != null)
-            timeText.text = currentTime.ToString("00") + ":00" + ((am) ? "am" : "pm");
+            timeText.text = hour.ToString("00") + ":" + minute.ToString("00") + ((am) ? "am" : "pm");
     }
 
     public void ShowWithinInteractRange()

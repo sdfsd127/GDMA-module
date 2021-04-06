@@ -27,8 +27,32 @@ public class PlayerInfo : MonoBehaviour
         playerNeeds[needIndex].RemoveResource(amount);
     }
 
+    public void LoseResource(string resourceName, int amount)
+    {
+        for (int i = 0; i < playerNeeds.Length; i++)
+        {
+            if (playerNeeds[i].m_RequirementName == resourceName)
+            {
+                LoseResource(i, amount);
+                break;
+            }
+        }
+    }
+
     public void GainResource(int needIndex, int amount)
     {
         playerNeeds[needIndex].AddResource(amount);
+    }
+
+    public void GainResource(string resourceName, int amount)
+    {
+        for (int i = 0; i < playerNeeds.Length; i++)
+        {
+            if (playerNeeds[i].m_RequirementName == resourceName)
+            {
+                GainResource(i, amount);
+                break;
+            }
+        }
     }
 }

@@ -15,11 +15,26 @@ public class GameManager : MonoBehaviour
     private PlayerInteracting playerInteracting;
 
     // Timing
-    private bool isMorning;
-    private int currentTime;
-    private const int MORNING_BEGIN_TIME = 9; // 09:00 am begin
     private const int HOUR_CLOCK = 12; // 12:00 hour clock
     private const int HOUR_INCREMENT = 1; // 01:00 hour increments
+    private const int MORNING_BEGIN_TIME = 9; // 09:00 am begin
+    private const int SLEEP_BEGIN_TIME = 11; // 11:00pm night time
+
+    private const int TIME_BETWEEN_TICK = 1; // The realtime (in seconds) between the addition of TIME_ON_TICK to current tick timer
+    private const int TIME_PER_TICK = 1; // The time added to the clock per tick
+    private const int TICKS_PER_GAUGE_TICK = 20; // How many ticks per resource gauge decrease
+    private Timer tickTimer;
+    private int tickCounter;
+
+    private bool isMorning;
+    private int currentHour;
+    private int currentMinute;
+
+    // Gauges
+    private const int HEALTH_DRAIN_PER_TICK = 1;
+    private const int HUNGER_DRAIN_PER_TICK = 3;
+    private const int THIRST_DRAIN_PER_TICK = 4;
+    private const int HYGIENE_DRAIN_PER_TICK = 2;
 
     // Cursor Control
     public static bool CURSOR_ACTIVE = true;
@@ -46,11 +61,26 @@ public class GameManager : MonoBehaviour
 
         // Set time vars
         isMorning = true;
-        currentTime = MORNING_BEGIN_TIME;
-        UIManager.Instance.SetTime(currentTime, isMorning);
+        currentHour = MORNING_BEGIN_TIME;
+        currentMinute = 0;
+
+        SetUITime(currentHour, currentMinute, isMorning);
+        SetupTickTimer();
 
         // Start cursor locked and vanished
         CursorControl.SetCursorState(CursorLockMode.Locked, false);
+    }
+
+    private void SetUITime(int hour, int minute, bool isMorning)
+    {
+        UIManager.Instance.SetTime(hour, minute, isMorning);
+    }
+
+    private void SetupTickTimer()
+    {
+        tickTimer = new Timer();
+        tickTimer.SetTargetTime(TIME_BETWEEN_TICK);
+        tickTimer.SetElapsedTime(0);
     }
 
     private void Update()
@@ -61,14 +91,51 @@ public class GameManager : MonoBehaviour
             FlipCurrentCursorState();
 
             if (GetCurrentCursorState())
-            {
                 CursorControl.SetCursorState(CursorLockMode.None, true);
-            }
             else
-            {
                 CursorControl.SetCursorState(CursorLockMode.Locked, false);
+        }
+
+        // Game Tick (LOGIC) Handling
+        tickTimer.AddTime(Time.deltaTime);
+
+        // Check if time between tick has elapsed
+        if (tickTimer.HasReachedTarget())
+        {
+            tickTimer.ResetTimer();
+            tickCounter++;
+
+            // Make time of day tick
+            AddMinute(TIME_PER_TICK);
+
+            // Check if time of day has reached night
+            CheckForEndOfDay();
+
+            // Make gauges tick every 10 ticks
+            if (tickCounter == TICKS_PER_GAUGE_TICK)
+            {
+                tickCounter = 0;
+
+                LoseGaugeResource("Health", HEALTH_DRAIN_PER_TICK);
+                LoseGaugeResource("Hunger", HUNGER_DRAIN_PER_TICK);
+                LoseGaugeResource("Thirst", THIRST_DRAIN_PER_TICK);
+                LoseGaugeResource("Hygiene", HYGIENE_DRAIN_PER_TICK);
             }
         }
+    }
+
+    private void CheckForEndOfDay()
+    {
+        //if (IsEndOfDay())
+            // TODO:
+    }
+
+    private bool IsEndOfDay()
+    {
+        if (currentHour >= SLEEP_BEGIN_TIME)
+            return true;
+        else
+            return false;
     }
 
     private void UpdatePlayerGauges()
@@ -86,6 +153,13 @@ public class GameManager : MonoBehaviour
         UpdatePlayerGauges();
     }
 
+    private void LoseGaugeResource(string resourceName, int amount)
+    {
+        playerInfo.LoseResource(resourceName, amount);
+
+        UpdatePlayerGauges();
+    }
+
     private void GainGaugeResource(int gaugeIndex, int amount)
     {
         playerInfo.GainResource(gaugeIndex, amount);
@@ -93,17 +167,37 @@ public class GameManager : MonoBehaviour
         UpdatePlayerGauges();
     }
 
-    private void AlterTime(int amount)
+    private void GainGaugeResource(string resourceName, int amount)
     {
-        currentTime += amount;
+        playerInfo.GainResource(resourceName, amount);
 
-        if (currentTime >= HOUR_CLOCK)
+        UpdatePlayerGauges();
+    }
+
+    private void AddMinute(int amount)
+    {
+        currentMinute += amount;
+
+        if (currentMinute >= 60)
         {
-            currentTime -= HOUR_CLOCK;
+            currentMinute -= 60;
+            AddHour(1);
+        }
+        else
+            SetUITime(currentHour, currentMinute, isMorning);
+    }
+
+    private void AddHour(int amount)
+    {
+        currentHour += amount;
+
+        if (currentHour >= 12)
+        {
+            currentHour -= 12;
             isMorning = !isMorning;
         }
-                
-        UIManager.Instance.SetTime(currentTime, isMorning);
+
+        SetUITime(currentHour, currentMinute, isMorning);
     }
 
     //
