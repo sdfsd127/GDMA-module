@@ -33,7 +33,7 @@ public class Minigame : MonoBehaviour
         SetEndConditionTimerTarget(timerTarget);
     }
 
-    public void UpdateMinigame()
+    protected void UpdateMinigame()
     {
         m_Timer.AddTime(Time.deltaTime);
 

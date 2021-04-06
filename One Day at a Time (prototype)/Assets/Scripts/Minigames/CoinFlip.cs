@@ -31,7 +31,7 @@ public class CoinFlip : Minigame
     {
         // Base Class
         m_MinigameName = "Coin Flip";
-        m_DisplayedInformation = "This is Coin Flipper.";
+        m_DisplayedInformation = "This is Coin Flip.";
         m_MinigameEndCondition = MINIGAME_END_CONDITION.WIN_LOSE;
 
         InitMinigame();

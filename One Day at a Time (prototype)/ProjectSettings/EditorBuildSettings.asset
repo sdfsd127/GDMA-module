@@ -20,4 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Minigames/Target Clicker.unity
     guid: 2ee1b4aed96dbb24a98a6b483145b3b1
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Flip a Coin.unity
+    guid: fdb5ca4a834dc8242b0b6ac0b9b3fb75
+  - enabled: 1
+    path: Assets/Scenes/Minigames/Press the  Colour.unity
+    guid: 64433761f34460442a22e2e92eddc6e1
   m_configObjects: {}
