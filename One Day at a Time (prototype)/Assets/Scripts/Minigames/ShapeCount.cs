@@ -14,13 +14,16 @@ public class ShapeCount : Minigame
 
     private const int MIN_SHAPES = 10;
     private const int MAX_SHAPES = 30;
+    private int actualMinShapes;
+    private int actualMaxShapes;
 
     private const float BOUND = 4.0f;
     private Vector2 UPPER_LEFT = new Vector2(-BOUND, BOUND);
     private Vector2 BOTTOM_RIGHT = new Vector2(BOUND, -BOUND);
     private Vector2 OFFSET = new Vector2(0.0f, 1.0f);
 
-    private const float MAX_TIME_ALLOWED = 30.0f;
+    private const int MAX_TIME = 30;
+    private int actualMaxTime;
     private float currentTime;
 
     [SerializeField] private Text timeText;
@@ -32,6 +35,7 @@ public class ShapeCount : Minigame
 
     private int timesCorrect;
     private const int MAX_TIMES_CORRECT = 5;
+    private int actualMaxCorrect;
 
     private enum SHAPE
     {
@@ -46,15 +50,20 @@ public class ShapeCount : Minigame
     //
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Shape Counting";
-        m_DisplayedInformation = "This is Shape Counting.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.BEFORE_TIMER;
+        InitShapeCount();
+        InitMinigame("Shape Counting", MINIGAME_END_CONDITION.BEFORE_TIMER, actualMaxTime);
+    }
 
-        InitMinigame(MAX_TIME_ALLOWED);
-
-        // This Class
+    private void InitShapeCount()
+    {
         shapes = new List<GameObject>();
+
+        // Account for difficulty here by scaling time, number required correct and number of shapes visible
+        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
+        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * m_MinigameDifficulty);
+
+        actualMinShapes = (int)(MIN_SHAPES * m_MinigameDifficulty);
+        actualMaxShapes = (int)(MAX_SHAPES * m_MinigameDifficulty);
 
         NewSetup();
     }
@@ -63,10 +72,10 @@ public class ShapeCount : Minigame
     {
         currentTime += Time.deltaTime;
 
-        if (currentTime >= MAX_TIME_ALLOWED && !Completed)
+        if (currentTime >= actualMaxTime && !Completed)
             MinigameLost();
         else
-            timeText.text = (MAX_TIME_ALLOWED - currentTime).ToString("00:00");
+            timeText.text = (actualMaxTime - currentTime).ToString("00:00");
     }
 
     private void NewSetup()
@@ -106,7 +115,7 @@ public class ShapeCount : Minigame
     private void GetShapeNumberSplit(ref int circles, ref int squares, ref int triangles)
     {
         // Randomly pick max pool size of shapes
-        int numOfShapes = Random.Range(MIN_SHAPES, MAX_SHAPES);
+        int numOfShapes = Random.Range(actualMinShapes, actualMaxShapes);
 
         // Randomly pick the number of each shape type
         circles = Random.Range(0, numOfShapes);
@@ -183,7 +192,7 @@ public class ShapeCount : Minigame
 
     private void UpdateNumberCorrect() 
     {
-        scoreText.text = timesCorrect + " / " + MAX_TIMES_CORRECT;
+        scoreText.text = timesCorrect + " / " + actualMaxCorrect;
     }
 
     //
@@ -222,7 +231,7 @@ public class ShapeCount : Minigame
         {
             timesCorrect++;
 
-            if (timesCorrect >= MAX_TIMES_CORRECT)
+            if (timesCorrect >= actualMaxCorrect)
                 MinigameWon();
             else
             {

@@ -20,6 +20,8 @@ public class ColourPress : Minigame
     private const int MAX_TIME = 20;
     private const int MAX_CORRECT = 15;
     private int currentCorrect;
+    private int actualMaxTime;
+    private int actualMaxCorrect;
 
     [SerializeField] private Text timeText;
     [SerializeField] private Text scoreText;
@@ -30,21 +32,18 @@ public class ColourPress : Minigame
 
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Colour Press";
-        m_DisplayedInformation = "This is Colour Press.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.BEFORE_TIMER;
-
-        InitMinigame(MAX_TIME);
-
-        // This Class
         InitColourPress();
+        InitMinigame("Colour Press", MINIGAME_END_CONDITION.BEFORE_TIMER, actualMaxTime);
     }
 
     private void InitColourPress()
     {
         currentCorrect = 0;
         correctButtonIndex = -1;
+
+        // Account for difficulty here by scaling time and number correct needed
+        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
+        actualMaxCorrect = (int)(MAX_CORRECT * m_MinigameDifficulty);
 
         SetupColours();
         NewSetup();
@@ -144,12 +143,12 @@ public class ColourPress : Minigame
 
     private void SetUITimeText()
     {
-        timeText.text = (MAX_TIME - GetTimerElapsedTime()).ToString("0.0");
+        timeText.text = (actualMaxTime - GetTimerElapsedTime()).ToString("0.0");
     }
 
     private void SetUIScoreText()
     {
-        scoreText.text = currentCorrect + " / " + MAX_CORRECT;
+        scoreText.text = currentCorrect + " / " + actualMaxCorrect;
     }
 
     private void CorrectGuess()
@@ -157,7 +156,7 @@ public class ColourPress : Minigame
         currentCorrect++;
         SetUIScoreText();
 
-        if (currentCorrect >= MAX_CORRECT)
+        if (currentCorrect >= actualMaxCorrect)
             MinigameWon();
         else
             NewSetup();

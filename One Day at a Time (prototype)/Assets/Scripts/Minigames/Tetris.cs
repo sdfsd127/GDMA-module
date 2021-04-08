@@ -72,7 +72,8 @@ public class Tetris : Minigame
     [SerializeField] private bool SHOW_FIRST_THREE; // Whether or not to render the first three rows of the tetris shape
     private bool needNewPiece;
 
-    [SerializeField] private float LEVEL_TIME;
+    private const int MAX_TIME = 30;
+    private int actualMaxTime;
 
     // UI
     [SerializeField] private Text timeText;
@@ -82,23 +83,31 @@ public class Tetris : Minigame
     //
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Tetris";
-        m_DisplayedInformation = "This is Tetris.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.AFTER_TIMER;
-
-        InitMinigame(LEVEL_TIME);
-
-        // This Class
-        InitBoard();
-        InitShapes();
-
         InitTetris();
+        InitMinigame("Tetris", MINIGAME_END_CONDITION.AFTER_TIMER, actualMaxTime);
+    }
+
+    private void InitTetris()
+    {
+        // Setup the timer
+        gameStepTimer = new Timer();
+        gameStepTimer.SetElapsedTime(0);
+        gameStepTimer.SetTargetTime(TIME_STEP);
 
         // Centre camera
         int yDif = (SHOW_FIRST_THREE) ? 0 : -3;
         Camera.main.transform.position = new Vector3((BOARD_WIDTH / 2) + 0.5f, (BOARD_HEIGHT / 2) + 0.5f + yDif, Camera.main.transform.position.z);
 
+        // Account for difficulty here by scaling time and number of hits required
+        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
+
+        // Setup the board
+        InitBoard();
+
+        // Setup the shapes
+        InitShapes();
+
+        // Begin the game
         BeginTetris();
     }
 
@@ -141,13 +150,6 @@ public class Tetris : Minigame
         shapesList.Add(new TetrisShape("~#~###~~~", '#')); // T Shape
 
         shapes = shapesList.ToArray();
-    }
-
-    private void InitTetris()
-    {
-        gameStepTimer = new Timer();
-        gameStepTimer.SetElapsedTime(0);
-        gameStepTimer.SetTargetTime(TIME_STEP);
     }
 
     private void BeginTetris()
@@ -198,7 +200,7 @@ public class Tetris : Minigame
         else
         {
             gameStepTimer.AddTime(Time.deltaTime);
-            timeText.text = (LEVEL_TIME - GetTimerElapsedTime()).ToString("0.0");
+            timeText.text = (actualMaxTime - GetTimerElapsedTime()).ToString("0.0");
         }
         
         // Move Left

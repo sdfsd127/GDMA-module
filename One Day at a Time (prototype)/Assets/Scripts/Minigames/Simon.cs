@@ -28,6 +28,7 @@ public class Simon : Minigame
 
     private int currentCount;
     private const int MAX_COUNT = 5;
+    private int actualMaxCount;
     private const float TIME_BETWEEN_FADE_CYCLE = 0.25f;
     private const float TIME_HIGHLIGHTED = 0.5f;
 
@@ -38,32 +39,30 @@ public class Simon : Minigame
     //
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Simon";
-        m_DisplayedInformation = "This is Simon.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.WIN_LOSE;
+        InitSimon();
+        InitMinigame("Simon", MINIGAME_END_CONDITION.WIN_LOSE);
+    }
 
-        InitMinigame();
-
-        // This Class
+    private void InitSimon()
+    {
+        // Begin colour memory entry list
         colourEntries = new List<COLOUR>();
 
+        // Enter all colours into the list
         originalColours = new Color[squareGrids.Length];
         for (int i = 0; i < squareGrids.Length; i++)
             originalColours[i] = squareGrids[i].color;
 
         currentCount = 0;
 
+        // Account for difficulty by scaling the size of the sequence of colours
+        actualMaxCount = (int)(MAX_COUNT * m_MinigameDifficulty);
+
         // Begin
         UpdateNumberCompleted();
 
         AddNewColour();
         DisplayCurrentPattern();
-    }
-
-    private void Update()
-    {
-
     }
 
     private void AddNewColour()

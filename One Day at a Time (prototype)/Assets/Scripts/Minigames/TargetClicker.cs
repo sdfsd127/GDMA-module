@@ -8,6 +8,8 @@ public class TargetClicker : Minigame
     private const int MAX_TIME = 30;
     private const int MAX_TARGETS = 30;
     private int currentTargetsHit;
+    private int actualMaxTime;
+    private int actualMaxTargets;
 
     [SerializeField] private Text targetsHitText;
     [SerializeField] private Text timeText;
@@ -20,20 +22,18 @@ public class TargetClicker : Minigame
 
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Target Clicker";
-        m_DisplayedInformation = "This is Target Clicker.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.BEFORE_TIMER;
-
-        InitMinigame(MAX_TIME);
-
-        // This Class
         InitTargetClicker();
+        InitMinigame("Target Clicker", MINIGAME_END_CONDITION.BEFORE_TIMER, actualMaxTime);
     }
 
     private void InitTargetClicker()
     {
         currentTargetsHit = 0;
+
+        // Account for difficulty here by scaling time and number of hits required
+        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
+        actualMaxTargets = (int)(MAX_TARGETS * m_MinigameDifficulty);
+
         UpdateTargetUIText();
         SpawnNewTarget();
     }
@@ -70,7 +70,7 @@ public class TargetClicker : Minigame
         currentTargetsHit++;
         UpdateTargetUIText();
 
-        if (currentTargetsHit < MAX_TARGETS)
+        if (currentTargetsHit < actualMaxTargets)
         {
             RemoveCurrentTarget();
             SpawnNewTarget();
@@ -95,12 +95,12 @@ public class TargetClicker : Minigame
 
     private void UpdateTargetUIText()
     {
-        targetsHitText.text = currentTargetsHit + " / " + MAX_TARGETS;
+        targetsHitText.text = currentTargetsHit + " / " + actualMaxTargets;
     }
 
     private void UpdateTimeText()
     {
-        timeText.text = ((float)MAX_TIME - GetTimerElapsedTime()).ToString("0.0");
+        timeText.text = ((float)actualMaxTime - GetTimerElapsedTime()).ToString("0.0");
     }
 
     //

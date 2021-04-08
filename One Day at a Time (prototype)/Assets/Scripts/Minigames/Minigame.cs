@@ -12,11 +12,11 @@ public class Minigame : MonoBehaviour
         BEFORE_TIMER = 1, // Minigame must be completed by an action before the timer
         AFTER_TIMER = 2 // Minigame is completed when the timer is up
     }
-    protected MINIGAME_END_CONDITION m_MinigameEndCondition;
+    protected MINIGAME_END_CONDITION m_MinigameEndCondition; // This minigames method of concluding
+
+    public static float m_MinigameDifficulty = 1.0f; // The difficulty of the minigame which slightly tweaks minigame gameplay (Between 1 and 2)
 
     protected string m_MinigameName; // Name of the minigame
-    protected string m_DisplayedInformation; // The raw text that is displayed to the players during the minigame in the helpful info box
-
     private bool m_Completed; // Whether the minigame has been completed or not
     protected bool Completed
     { 
@@ -26,11 +26,28 @@ public class Minigame : MonoBehaviour
 
     private Timer m_Timer = new Timer();
 
-    protected void InitMinigame(float timerTarget = 0.0f)
+    protected void InitMinigame(string minigameName, MINIGAME_END_CONDITION endCondition, float timerTarget = 0.0f)
     {
-        ControlCursor();
+        m_MinigameName = minigameName;
+        m_MinigameEndCondition = endCondition;
+        
+        if (timerTarget > 0.0f)
+            SetEndConditionTimerTarget(timerTarget);
 
-        SetEndConditionTimerTarget(timerTarget);
+        ControlCursor();
+    }
+
+    private void SetEndConditionTimerTarget(float endTime)
+    {
+        m_Timer.SetTargetTime(endTime);
+    }
+
+    private void ControlCursor()
+    {
+        if (!Completed)
+            CursorControl.SetCursorState(CursorLockMode.None, true);
+        else
+            CursorControl.SetCursorState(CursorLockMode.Locked, false);
     }
 
     protected void UpdateMinigame()
@@ -66,19 +83,6 @@ public class Minigame : MonoBehaviour
         Completed = true;
         Debug.Log("MINIGAME WON");
         SceneManager.LoadScene("Main Scene");
-    }
-
-    private void ControlCursor()
-    {
-        if (!Completed)
-            CursorControl.SetCursorState(CursorLockMode.None, true);
-        else
-            CursorControl.SetCursorState(CursorLockMode.Locked, false);
-    }
-
-    private void SetEndConditionTimerTarget(float endTime)
-    {
-        m_Timer.SetTargetTime(endTime);
     }
 
     protected float GetTimerElapsedTime()

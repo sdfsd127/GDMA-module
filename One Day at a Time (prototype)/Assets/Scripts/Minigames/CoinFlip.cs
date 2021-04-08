@@ -7,6 +7,7 @@ public class CoinFlip : Minigame
 {
     private const int MAX_TIMES_CORRECT = 3;
     private int currentTimesCorrect;
+    private int actualMaxCorrect;
 
     private const int MAX_ROTATIONS = 7;
     private const int MIN_ROTATIONS = 2;
@@ -29,21 +30,18 @@ public class CoinFlip : Minigame
 
     private void Start()
     {
-        // Base Class
-        m_MinigameName = "Coin Flip";
-        m_DisplayedInformation = "This is Coin Flip.";
-        m_MinigameEndCondition = MINIGAME_END_CONDITION.WIN_LOSE;
-
-        InitMinigame();
-
-        // This Class
         InitCoinFlip();
+        InitMinigame("Coin Flip", MINIGAME_END_CONDITION.WIN_LOSE);
     }
 
     private void InitCoinFlip()
     {
         currentTimesCorrect = 0;
         coinCurrentSideShowing = SIDE.TAILS;
+
+        // Account for difficulty here by scaling the times necessary correct
+        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * m_MinigameDifficulty);
+
         UpdateCorrectTextUI();
     }
 
@@ -97,7 +95,7 @@ public class CoinFlip : Minigame
             currentTimesCorrect++;
             UpdateCorrectTextUI();
 
-            if (currentTimesCorrect >= MAX_TIMES_CORRECT)
+            if (currentTimesCorrect >= actualMaxCorrect)
                 MinigameWon();
         }
         else
@@ -114,7 +112,7 @@ public class CoinFlip : Minigame
 
     private void UpdateCorrectTextUI()
     {
-        scoreText.text = currentTimesCorrect + " / " + MAX_TIMES_CORRECT;
+        scoreText.text = currentTimesCorrect + " / " + actualMaxCorrect;
     }
 
     //

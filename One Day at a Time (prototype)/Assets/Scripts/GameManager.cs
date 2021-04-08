@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
     private const int TIME_BETWEEN_TICK = 1; // The realtime (in seconds) between the addition of TIME_ON_TICK to current tick timer
     private const int TIME_PER_TICK = 1; // The time added to the clock per tick
-    private const int TICKS_PER_GAUGE_TICK = 20; // How many ticks per resource gauge decrease
+    private const int TICKS_PER_GAUGE_TICK = 3; // How many ticks per resource gauge decrease
     private Timer tickTimer;
     private int tickCounter;
 
@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 
     // Names of the scenes of the minigames
     [SerializeField] private string[] minigames;
+
+    private const float EMPTY_GAUGE_DIFFICULTY_INCREASE = 0.5f; // The value added to the difficulty if a bar was entirely empty
 
     private void Awake()
     {
@@ -200,6 +202,24 @@ public class GameManager : MonoBehaviour
         SetUITime(currentHour, currentMinute, isMorning);
     }
 
+    private void UpdateDifficulty()
+    {
+        Minigame.m_MinigameDifficulty = GetCurrentDifficulty();
+        Debug.Log(Minigame.m_MinigameDifficulty);
+    }
+
+    private float GetCurrentDifficulty()
+    {
+        // Combine all the player basic need stats
+        float playerStatsTotal = playerInfo.GetPercentage("Health") + playerInfo.GetPercentage("Hunger") + playerInfo.GetPercentage("Thirst") + playerInfo.GetPercentage("Hygiene");
+        float missingPercent = 4 - playerStatsTotal;
+
+        // Add a base value of 1 for the neutral difficulty
+        // Add (difference * EMPTY_GAUGE_DIFFICULTY_INCREASE) so full gauges increase the difficulty by 0 and empty gauges by 1
+        // Simplified 1 + (difference * EMPTY_GAUGE_DIFFICULTY_INCREASE)
+        return 1 + (missingPercent * EMPTY_GAUGE_DIFFICULTY_INCREASE);
+    }
+
     //
     // EXTERNAL FUNCTIONS
     // 
@@ -217,6 +237,7 @@ public class GameManager : MonoBehaviour
 
     public void PlayMinigame(string name)
     {
+        UpdateDifficulty();
         SceneManager.LoadScene(name);
     }
 
