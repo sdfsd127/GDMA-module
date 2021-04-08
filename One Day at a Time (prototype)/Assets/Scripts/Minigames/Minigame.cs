@@ -14,8 +14,6 @@ public class Minigame : MonoBehaviour
     }
     protected MINIGAME_END_CONDITION m_MinigameEndCondition; // This minigames method of concluding
 
-    public static float m_MinigameDifficulty = 1.0f; // The difficulty of the minigame which slightly tweaks minigame gameplay (Between 1 and 2)
-
     protected string m_MinigameName; // Name of the minigame
     private bool m_Completed; // Whether the minigame has been completed or not
     protected bool Completed

@@ -40,7 +40,7 @@ public class CoinFlip : Minigame
         coinCurrentSideShowing = SIDE.TAILS;
 
         // Account for difficulty here by scaling the times necessary correct
-        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * m_MinigameDifficulty);
+        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * ConsistentData.m_MinigameDifficulty);
 
         UpdateCorrectTextUI();
     }

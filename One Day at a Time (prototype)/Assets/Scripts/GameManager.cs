@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
     // Names of the scenes of the minigames
     [SerializeField] private string[] minigames;
 
-    private const float EMPTY_GAUGE_DIFFICULTY_INCREASE = 0.5f; // The value added to the difficulty if a bar was entirely empty
+    private const float EMPTY_GAUGE_DIFFICULTY_INCREASE = 0.35f; // The value added to the difficulty if a bar was entirely empty
 
     private void Awake()
     {
@@ -61,12 +61,16 @@ public class GameManager : MonoBehaviour
         playerLooking = playerObject.GetComponentInChildren<PlayerLooking>();
         playerInteracting = playerObject.GetComponentInChildren<PlayerInteracting>();
 
-        // Set time vars
-        isMorning = true;
-        currentHour = MORNING_BEGIN_TIME;
-        currentMinute = 0;
+        // Load in current time
+        currentHour = ConsistentData.m_CurrentHour;
+        currentMinute = ConsistentData.m_CurrentMinute;
+        isMorning = ConsistentData.m_IsMorning;
 
+        // Setup UI
         SetUITime(currentHour, currentMinute, isMorning);
+        UpdatePlayerGauges();
+
+        // Setup game tick timer
         SetupTickTimer();
 
         // Start cursor locked and vanished
@@ -76,6 +80,14 @@ public class GameManager : MonoBehaviour
     private void SetUITime(int hour, int minute, bool isMorning)
     {
         UIManager.Instance.SetTime(hour, minute, isMorning);
+    }
+
+    private void UpdatePlayerGauges()
+    {
+        UIManager.Instance.SetGauge(0, playerInfo.GetPercentage("Health"));
+        UIManager.Instance.SetGauge(1, playerInfo.GetPercentage("Hunger"));
+        UIManager.Instance.SetGauge(2, playerInfo.GetPercentage("Thirst"));
+        UIManager.Instance.SetGauge(3, playerInfo.GetPercentage("Hygiene"));
     }
 
     private void SetupTickTimer()
@@ -140,14 +152,6 @@ public class GameManager : MonoBehaviour
             return false;
     }
 
-    private void UpdatePlayerGauges()
-    {
-        UIManager.Instance.SetGauge(0, playerInfo.GetPercentage("Health"));
-        UIManager.Instance.SetGauge(1, playerInfo.GetPercentage("Hunger"));
-        UIManager.Instance.SetGauge(2, playerInfo.GetPercentage("Thirst"));
-        UIManager.Instance.SetGauge(3, playerInfo.GetPercentage("Hygiene"));
-    }
-
     private void LoseGaugeResource(int gaugeIndex, int amount)
     {
         playerInfo.LoseResource(gaugeIndex, amount);
@@ -204,8 +208,10 @@ public class GameManager : MonoBehaviour
 
     private void UpdateDifficulty()
     {
-        Minigame.m_MinigameDifficulty = GetCurrentDifficulty();
-        Debug.Log(Minigame.m_MinigameDifficulty);
+        // Update cross scene data store of difficulty
+        ConsistentData.m_MinigameDifficulty = GetCurrentDifficulty();
+
+        Debug.Log(ConsistentData.m_MinigameDifficulty);
     }
 
     private float GetCurrentDifficulty()
@@ -218,6 +224,20 @@ public class GameManager : MonoBehaviour
         // Add (difference * EMPTY_GAUGE_DIFFICULTY_INCREASE) so full gauges increase the difficulty by 0 and empty gauges by 1
         // Simplified 1 + (difference * EMPTY_GAUGE_DIFFICULTY_INCREASE)
         return 1 + (missingPercent * EMPTY_GAUGE_DIFFICULTY_INCREASE);
+    }
+
+    private void UpdateConsistentStorage()
+    {
+        // Update time
+        ConsistentData.m_CurrentHour = currentHour;
+        ConsistentData.m_CurrentMinute = currentMinute;
+        ConsistentData.m_IsMorning = isMorning;
+
+        // Update gauges
+        ConsistentData.m_HealthPercent = playerInfo.GetPercentage("Health");
+        ConsistentData.m_HungerPercent = playerInfo.GetPercentage("Hunger");
+        ConsistentData.m_ThirstPercent = playerInfo.GetPercentage("Thirst");
+        ConsistentData.m_HygienePercent = playerInfo.GetPercentage("Hygiene");
     }
 
     //
@@ -237,7 +257,13 @@ public class GameManager : MonoBehaviour
 
     public void PlayMinigame(string name)
     {
+        // Calculate new difficulty
         UpdateDifficulty();
+
+        // Also update time and gauges
+        UpdateConsistentStorage();
+
+        // Load the minigame
         SceneManager.LoadScene(name);
     }
 

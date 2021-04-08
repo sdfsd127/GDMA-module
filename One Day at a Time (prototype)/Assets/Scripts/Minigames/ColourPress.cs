@@ -42,8 +42,8 @@ public class ColourPress : Minigame
         correctButtonIndex = -1;
 
         // Account for difficulty here by scaling time and number correct needed
-        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
-        actualMaxCorrect = (int)(MAX_CORRECT * m_MinigameDifficulty);
+        actualMaxTime = (int)(MAX_TIME / ConsistentData.m_MinigameDifficulty);
+        actualMaxCorrect = (int)(MAX_CORRECT * ConsistentData.m_MinigameDifficulty);
 
         SetupColours();
         NewSetup();

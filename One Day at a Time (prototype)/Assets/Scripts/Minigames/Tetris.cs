@@ -99,7 +99,7 @@ public class Tetris : Minigame
         Camera.main.transform.position = new Vector3((BOARD_WIDTH / 2) + 0.5f, (BOARD_HEIGHT / 2) + 0.5f + yDif, Camera.main.transform.position.z);
 
         // Account for difficulty here by scaling time and number of hits required
-        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
+        actualMaxTime = (int)(MAX_TIME / ConsistentData.m_MinigameDifficulty);
 
         // Setup the board
         InitBoard();

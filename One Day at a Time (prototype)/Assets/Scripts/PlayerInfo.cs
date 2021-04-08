@@ -6,11 +6,25 @@ public class PlayerInfo : MonoBehaviour
 {
     public BasicNeed[] playerNeeds;
 
-    private const int MAX_VALUE = 100;
+    private const float FULL_PERCENT = 1.0f;
 
     public PlayerInfo()
     {
         playerNeeds = new BasicNeed[] { new BasicNeed("Health"), new BasicNeed("Hunger"), new BasicNeed("Thirst"), new BasicNeed("Hygiene") };
+
+        LoadPreviousValues();
+    }
+
+    private void LoadPreviousValues()
+    {
+        if (ConsistentData.m_HealthPercent != FULL_PERCENT)
+            playerNeeds[0].SetPercentage(ConsistentData.m_HealthPercent);
+        if (ConsistentData.m_HungerPercent != FULL_PERCENT)
+            playerNeeds[1].SetPercentage(ConsistentData.m_HungerPercent);
+        if (ConsistentData.m_ThirstPercent != FULL_PERCENT)
+            playerNeeds[2].SetPercentage(ConsistentData.m_ThirstPercent);
+        if (ConsistentData.m_HygienePercent != FULL_PERCENT)
+            playerNeeds[3].SetPercentage(ConsistentData.m_HygienePercent);
     }
 
     public float GetPercentage(string needName)

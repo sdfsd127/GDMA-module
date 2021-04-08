@@ -31,8 +31,8 @@ public class TargetClicker : Minigame
         currentTargetsHit = 0;
 
         // Account for difficulty here by scaling time and number of hits required
-        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
-        actualMaxTargets = (int)(MAX_TARGETS * m_MinigameDifficulty);
+        actualMaxTime = (int)(MAX_TIME / ConsistentData.m_MinigameDifficulty);
+        actualMaxTargets = (int)(MAX_TARGETS * ConsistentData.m_MinigameDifficulty);
 
         UpdateTargetUIText();
         SpawnNewTarget();

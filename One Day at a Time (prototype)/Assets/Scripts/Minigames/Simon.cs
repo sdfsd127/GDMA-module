@@ -56,7 +56,7 @@ public class Simon : Minigame
         currentCount = 0;
 
         // Account for difficulty by scaling the size of the sequence of colours
-        actualMaxCount = (int)(MAX_COUNT * m_MinigameDifficulty);
+        actualMaxCount = (int)(MAX_COUNT * ConsistentData.m_MinigameDifficulty);
 
         // Begin
         UpdateNumberCompleted();

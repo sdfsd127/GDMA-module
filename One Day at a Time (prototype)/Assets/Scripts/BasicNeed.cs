@@ -12,6 +12,11 @@
         m_MaxValue = maxValue;
     }
 
+    public void SetPercentage(float percent) 
+    {
+        m_CurrentValue = (int)(m_MaxValue * percent);
+    }
+
     public float GetPercentage()
     {
         return (float)m_CurrentValue / (float)m_MaxValue;

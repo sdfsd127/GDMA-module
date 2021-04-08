@@ -59,11 +59,11 @@ public class ShapeCount : Minigame
         shapes = new List<GameObject>();
 
         // Account for difficulty here by scaling time, number required correct and number of shapes visible
-        actualMaxTime = (int)(MAX_TIME / m_MinigameDifficulty);
-        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * m_MinigameDifficulty);
+        actualMaxTime = (int)(MAX_TIME / ConsistentData.m_MinigameDifficulty);
+        actualMaxCorrect = (int)(MAX_TIMES_CORRECT * ConsistentData.m_MinigameDifficulty);
 
-        actualMinShapes = (int)(MIN_SHAPES * m_MinigameDifficulty);
-        actualMaxShapes = (int)(MAX_SHAPES * m_MinigameDifficulty);
+        actualMinShapes = (int)(MIN_SHAPES * ConsistentData.m_MinigameDifficulty);
+        actualMaxShapes = (int)(MAX_SHAPES * ConsistentData.m_MinigameDifficulty);
 
         NewSetup();
     }
